@@ -1,22 +1,8 @@
+# Arcade Tools
+
 Created by Floofer++
 
 Uses the "math" library built-in to python
-
------------------------------------------
-
-    ###  ####  #####  ###  ####  #####
-   \#   # #   # #     #   # #   # #
-   \##### ####  #     ##### #   # ###
-   \#   # #   # #     #   # #   # #
-   \#   # #   # ##### #   # ####  #####
-
-   \#####  ###   ###  #      ####
-     #   #   # #   # #     #
-     #   #   # #   # #      ###
-     #   #   # #   # #         #
-     #    ###   ###  ##### ####
-
------------------------------------------
 
 Arcade Tools does not intend to infringe upon the rights
 of lowiro (c), nor is it intended to be used to break their
