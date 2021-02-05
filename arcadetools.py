@@ -69,7 +69,7 @@ def is_inherited(inst, cls):
 
 # TIMING LIST MANAGEMENT #
 # Gets the correct timing used for any note at time "time"
-# from a list of provided timings "timings"
+# from a list of provided timings
 def get_nearest_timing(time, timings):
     for i, timing in enumerate(timings):
 
