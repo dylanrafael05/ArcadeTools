@@ -69,7 +69,7 @@ def is_inherited(inst, cls):
 
 # TIMING LIST MANAGEMENT #
 # Gets the correct timing used for any note at time "time"
-# from a list of provided timings
+# from a list of provided timings "timings"
 def get_nearest_timing(time, timings):
     for i, timing in enumerate(timings):
 
@@ -83,6 +83,17 @@ def get_nearest_timing(time, timings):
 # Adds numerical line markers within a string
 def add_line_markers(val):
     return "\n".join(f"{i}\t| {l}" for i, l in val.splitlines())
+
+
+# SUBSTRING BY STRINGS #
+# Creates a substring of a string where the start
+# and end are denoted by a substring to find
+def substr_by_strs(val: str, start, end):
+    st_idx = val.find(start)
+    end_idx = val.find(end)
+    if st_idx == -1 or end_idx == -1:
+        raise ValueError("No such substrings founds")
+    return val[st_idx+1:end_idx]
 
 
 # TIMING CLASS #
@@ -253,11 +264,11 @@ class Arc(Note):
             return None
 
         end_idx = val.find(")")
-        if not end_idx == -1:
+        if end_idx == -1:
             return None
 
-        spl = val[4:end_idx + 1].split(",")
-        end = val[end_idx:]
+        spl = val[4:end_idx].split(",")
+        end = val[end_idx+1:]
 
         try:
             tm = int(spl[0])
@@ -271,8 +282,8 @@ class Arc(Note):
             void = spl[9] == "true"
             ctp = []
             if len(end) > 1:
-                for arctap in end[1:-2].split(","):
-                    ctp.append(int(arctap))
+                for arctap in end.split(","):
+                    ctp.append(int(substr_by_strs(arctap, "(", ")")))
 
             return cls(tm, nd, x1, x2, tp, y1, y2, col, void, ctp)
         except ValueError and IndexError:
@@ -324,7 +335,7 @@ class Arc(Note):
                f"{'{:.2f}'.format(self.x2)},{self.arctype},{'{:.2f}'.format(self.y1)}," \
                f"{'{:.2f}'.format(self.y2)},{self.color},none," \
                f"{'true' if self.void else 'false'}" + \
-               f"[{','.join(self.arctaps)}];" if len(self.arctaps) > 0 else ");"
+               (f")[{','.join(f'arctap({x})' for x in self.arctaps)}];" if len(self.arctaps) > 0 else ");")
 
 
 # MAIN CLASSES #
@@ -499,7 +510,9 @@ class Aff:
     # note
     def sort_timings(self):
         for tg in self.tgs:
-            tg.timings = sorted(tg.timings, key=lambda t: t.time, reverse=True)
+            # Apparently this ONE line of code was fucking up everything in the program so
+            # fuck u python
+            tg.timings = sorted(tg.timings, key=lambda t: t.time)
 
     # AFF REPRESENTATION #
     # Convert the Aff instance into human-readable
@@ -549,7 +562,7 @@ class Aff:
 
             snapped_time = round_to(time, timing.ms_elapse / snap)
 
-            if abs(time - snapped_time) <= 1.5:
+            if abs(time - snapped_time) <= 2.5:
                 return floor(snapped_time)
 
         return time
@@ -578,7 +591,8 @@ class Aff:
 
                 elif type(note) == Arc:
 
-                    self.tgs[i].notes[j].end = self.fix_quantize_single(note.end, tg)
+                    if not note.end - note.time == 1:
+                        self.tgs[i].notes[j].end = self.fix_quantize_single(note.end, tg)
 
                     for k, arctap in enumerate(note.arctaps):
                         self.tgs[i].notes[j].arctaps[k] = self.fix_quantize_single(arctap, tg)
@@ -780,7 +794,7 @@ def main():
 
         elif currentState == "SAVE":
 
-            currentNavigation = input("Please enter the full path where you would like to save to:")
+            currentNavigation = input("Please enter the full path where you would like to save to: ")
 
             if currentNavigation == "BACK":
                 currentState = "MAIN"
